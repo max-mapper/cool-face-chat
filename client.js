@@ -1,9 +1,12 @@
-var net = require('net')
+var request = require('request')
+var log = require('single-line-log').stderr
 
 connect()
 
 function connect() {
-  var client = net.connect(9000, 'localhost', onConnected)
+  var client = request.post('http://localhost:9000')
+  
+  client.on('request', onConnected)
   
   function onConnected() {
     console.log('Welcome to cool-face-chat!')
@@ -14,11 +17,10 @@ function connect() {
   })
   
   client.on('error', function(err) {
-    console.log('Got a connection error.')
+    log('Got a connection error. Trying again...')
   })
 
-  client.on('close', function() {
-    console.log('Lost connection. Reconnecting...')
+  client.on('end', function() {
     process.stdin.unpipe(client)
     setTimeout(connect, 5000)
   })

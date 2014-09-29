@@ -1,20 +1,20 @@
-var net = require('net')
+var net = require('http')
 var child = require('child_process')
 
 var server = net.createServer(onConnection)
 
 var clients = {}
 
-function onConnection(socket) {
-  var ip = socket.remoteAddress
+function onConnection(req, res) {
+  var ip = req.connection.remoteAddress
   console.log('Client IP', ip)
-  clients[ip] = socket
+  clients[ip] = res
   
-  socket.on('close', function() {
+  req.on('close', function() {
     delete clients[ip]
   })
   
-  socket.on('data', function(chunk) {
+  req.on('data', function(chunk) {
     console.log('CHAT:', chunk.toString())
     Object.keys(clients).forEach(function(clientIP) {
       if (ip === clientIP) return
