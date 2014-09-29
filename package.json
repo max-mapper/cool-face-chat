@@ -4,13 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "beefy client.js",
+    "build": "browserify client.js -o bundle.js"
   },
   "author": "",
   "license": "BSD",
   "dependencies": {
     "request": "^2.44.0",
     "single-line-log": "^0.4.1",
+    "websocket-stream": "^1.0.2",
     "ws": "^0.4.32"
+  },
+  "devDependencies": {
+    "beefy": "^2.1.1"
   }
 }

@@ -1,12 +1,9 @@
-var request = require('request')
-var log = require('single-line-log').stderr
+var ws = require('websocket-stream')
 
 connect()
 
 function connect() {
-  var client = request.post('http://localhost:9000')
-  
-  client.on('request', onConnected)
+  var client = ws('ws://localhost:9000')
   
   function onConnected() {
     console.log('Welcome to cool-face-chat!')
@@ -17,13 +14,15 @@ function connect() {
   })
   
   client.on('error', function(err) {
-    log('Got a connection error. Trying again...')
+    console.log('Got a connection error.')
   })
 
-  client.on('end', function() {
-    process.stdin.unpipe(client)
+  client.on('close', function() {
+    console.log('Lost connection. Reconnecting...')
     setTimeout(connect, 5000)
   })
   
-  process.stdin.pipe(client)
+  setInterval(function() {
+    client.write('hello' + Math.random())
+  }, 1000)
 }

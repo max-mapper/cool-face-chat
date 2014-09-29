@@ -1,27 +1,32 @@
 var net = require('http')
 var child = require('child_process')
+var WebSocketServer = require('ws').Server
+var WebSocketStream = require('websocket-stream')
 
-var server = net.createServer(onConnection)
+var server = net.createServer()
+var wss = new WebSocketServer({server: server})
 
 var clients = {}
 
-function onConnection(req, res) {
-  var ip = req.connection.remoteAddress
+wss.on('connection', function(socket) {
+  var socket = WebSocketStream(socket)
+  console.log(socket)
+  var ip = socket.socket._socket.remoteAddress
   console.log('Client IP', ip)
-  clients[ip] = res
+  clients[ip] = socket
   
-  req.on('close', function() {
+  socket.on('close', function() {
     delete clients[ip]
   })
   
-  req.on('data', function(chunk) {
+  socket.on('data', function(chunk) {
     console.log('CHAT:', chunk.toString())
     Object.keys(clients).forEach(function(clientIP) {
       if (ip === clientIP) return
       clients[clientIP].write(chunk)
     })
   })
-}
+})
 
 setInterval(function() {
   child.exec('cool-face', function(err, stdout) {
